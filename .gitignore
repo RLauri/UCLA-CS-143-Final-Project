@@ -2,4 +2,3 @@
 *.parquet
 *.json
 labeled_data.csv
-parquet_maker.py
