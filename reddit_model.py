@@ -5,8 +5,7 @@ from pyspark.sql import SQLContext
 
 def main(context):
     """Main function takes a Spark SQL context."""
-    # YOUR CODE HERE
-    # YOU MAY ADD OTHER FUNCTIONS AS NEEDED
+    context.read.parquet("comments.parquet").printSchema()
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("CS143 Project 2B")
