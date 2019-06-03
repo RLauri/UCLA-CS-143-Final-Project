@@ -175,6 +175,9 @@ def sanitize(text):
 
     return unigrams + bigrams + trigrams
 
+sanitize_udf = udf(sanitize, ArrayType(StringType()))
+
+
 
 if __name__ == "__main__":
     # This is the Python main function.
