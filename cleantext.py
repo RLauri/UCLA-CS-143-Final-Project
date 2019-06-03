@@ -173,7 +173,7 @@ def sanitize(text):
         trigrams.append('_'.join(window))
     trigrams = ' '.join(trigrams)
 
-    return [parsed_text, unigrams, bigrams, trigrams]
+    return unigrams + bigrams + trigrams
 
 
 if __name__ == "__main__":
