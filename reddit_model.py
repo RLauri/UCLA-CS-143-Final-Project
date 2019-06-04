@@ -95,7 +95,7 @@ def main(context):
     """Main function takes a Spark SQL context."""
 	
     # TASK 1
-    if os.path.isdir("comments.parquet"):
+    if os.path.isdir("comments.parquet") and os.path.isdir("submissions.parquet") and os.path.isdir("labeled_data.parquet"):
         comments = context.read.parquet("comments.parquet")
         submissions = context.read.parquet("submissions.parquet")
         labeled_data = context.read.parquet("labeled_data.parquet")
@@ -173,7 +173,7 @@ def main(context):
     # TASK 7
     # Initialize two logistic regression models.
     # Replace labelCol with the column containing the label, and featuresCol with the column containing the features.
-    if os.path.isdir("project2/pos.model"):
+    if os.path.isdir("project2/pos.model") and os.path.isdir("project2/neg.model"):
         pos_model = CrossValidatorModel.load("project2/pos.model")
         neg_model = CrossValidatorModel.load("project2/neg.model")
     else:
@@ -227,6 +227,9 @@ def main(context):
     # task 5 redone
     sanitized_full_comments = generate_sanitized_full_comments(context, full_comments_data)
     sanitized_full_comments.show()
+
+    # task 6A
+    result_full_data = model.transform(sanitized_full_comments)
 
 
 
