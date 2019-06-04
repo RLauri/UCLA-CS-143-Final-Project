@@ -6,15 +6,15 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import StringType, ArrayType, BooleanType
 from pyspark.ml.feature import CountVectorizer
 from pyspark.ml.classification import LogisticRegression
-from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from pyspark.ml.tuning import CrossValidator, CrossValidatorModel, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
-
+from pyspark.sql.functions import ltrim
 
 from cleantext import sanitize 
 
 
 MIN_DF = 10
-TRAIN = True
+TRAIN = False
 
 
 def modified_sanitize(text):
@@ -50,6 +50,33 @@ FROM labeled_data
 JOIN comments ON Input_id = id"""
     return context.sql(join_comment_sql)
 
+def generate_full_comments_data(submissions, comments, context):
+    """
+    creates a data frame to fulfill the requirements of both tasks 8 and 9
+    """
+
+    # needed submissions view
+    submissions.createOrReplaceTempView("submissions")
+
+    # trims out leading 't3_' from comment links for task 8 and remakes view
+    # comments = comments.withColumn('link_id', ltrim('t3_', comments.link_id))
+    comments.createOrReplaceTempView("comments")
+
+    full_comment_join_sql = """
+SELECT
+    comments.link_id AS comment_id,
+    comments.body AS body,
+    comments.created_utc AS timestamp,
+    comments.author_flair_text AS state,
+    submissions.title AS title
+FROM comments
+JOIN submissions ON ltrim('t3_', comments.link_id) = submissions.id 
+AND comments.body NOT LIKE '%/s%' 
+AND comments.body NOT LIKE '&gt%'"""
+    return context.sql(full_comment_join_sql)
+
+
+
 
 def main(context):
     """Main function takes a Spark SQL context."""
@@ -69,52 +96,60 @@ def main(context):
         labeled_data.write.parquet("labeled_data.parquet") 
         labeled_data = context.read.csv("labeled_data.csv", header='true')
 
-    # TASK 4
-    context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
+    try:
+        sentiment_data = context.read.parquet("sentiment_data.parquet")
+    except:
 
-    # TASK 5
-    joined_data = generate_joined_data(labeled_data, comments, context)
-    joined_data.createOrReplaceTempView("joined_data")
+        # TASK 4
+        context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
 
-    ngram_sql = """
-SELECT 
-    Input_id,
-    labeldem,
-    labelgop,
-    labeldjt,
-    sanitize(body) AS body
-FROM joined_data"""
+        # TASK 5
+        joined_data = generate_joined_data(labeled_data, comments, context)
+        joined_data.createOrReplaceTempView("joined_data")
 
-    ngrams = context.sql(ngram_sql)
+        ngram_sql = """
+    SELECT 
+        Input_id,
+        labeldem,
+        labelgop,
+        labeldjt,
+        sanitize(body) AS body
+    FROM joined_data"""
 
-    # TASK 6A
-    # REFERENCE:
-    # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
+        ngrams = context.sql(ngram_sql)
 
-    vectorizer = CountVectorizer(inputCol="body",
-                                 outputCol="features",
-                                 minDF=MIN_DF,
-                                 binary=True)
-    model = vectorizer.fit(ngrams)
+        # TASK 6A
+        # REFERENCE:
+        # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
 
-    # TASK 6B
-    result = model.transform(ngrams)
-    result.createOrReplaceTempView("result")
+        vectorizer = CountVectorizer(inputCol="body",
+                                    outputCol="features",
+                                    minDF=MIN_DF,
+                                    binary=True)
+        model = vectorizer.fit(ngrams)
 
-    djt_sentiment_sql = """
-SELECT
-    *,
-    if (labeldjt = 1, 1, 0) AS pos_label,
-    if (labeldjt = -1, 1, 0) AS neg_label
-FROM result"""
-    sentiment_data = context.sql(djt_sentiment_sql)
-    sentiment_data.show()
+        # TASK 6B
+        result = model.transform(ngrams)
+        result.createOrReplaceTempView("result")
+
+        djt_sentiment_sql = """
+    SELECT
+        *,
+        if (labeldjt = 1, 1, 0) AS pos_label,
+        if (labeldjt = -1, 1, 0) AS neg_label
+    FROM result"""
+        sentiment_data = context.sql(djt_sentiment_sql)
+        sentiment_data.write.parquet("sentiment_data.parquet")
+        # sentiment_data.show()
 
 
     # TASK 7
     # Initialize two logistic regression models.
     # Replace labelCol with the column containing the label, and featuresCol with the column containing the features.
-    if TRAIN:
+    try:
+        pos_model = CrossValidatorModel.load("project2/pos.model")
+        neg_model = CrossValidatorModel.load("project2/neg.model")
+    except FileNotFoundError:
         poslr = LogisticRegression(labelCol="pos_label", featuresCol="features", maxIter=10)
         neglr = LogisticRegression(labelCol="neg_label", featuresCol="features", maxIter=10)
         # This is a binary classifier so we need an evaluator that knows how to deal with binary classifiers.
@@ -144,16 +179,17 @@ FROM result"""
         negTrain, negTest = sentiment_data.randomSplit([0.5, 0.5])
         # Train the models
         print("Training positive classifier...")
-        posModel = posCrossval.fit(posTrain)
+        pos_model = posCrossval.fit(posTrain)
         print("Training negative classifier...")
-        negModel = negCrossval.fit(negTrain)
+        neg_model = negCrossval.fit(negTrain)
 
         # Once we train the models, we don't want to do it again. We can save the models and load them again later.
-        posModel.save("project2/pos.model")
-        negModel.save("project2/neg.model")
+        pos_model.save("project2/pos.model")
+        neg_model.save("project2/neg.model")
 
     # TASK 8
-    joined_data = generate_joined_data(labeled_data, comments, context)
+    full_comments_data = generate_full_comments_data(submissions, comments, context)
+    full_comments_data.filter("state is not null or state is not 'Foreign'").show()
 
 
 if __name__ == "__main__":
