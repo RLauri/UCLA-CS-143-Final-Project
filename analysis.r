@@ -49,7 +49,7 @@ library(ggplot2)
 library(dplyr)
 library(maps)
 
-state.data <- read.csv("state_data.csv", header=TRUE)
+state.data <- read.csv("state_data.csv/part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv", header=TRUE)
 # rename it due to the format of the state data
 state.data$region <- state.data$state
 chloro <- state.data %>% mutate(region=tolower(region)) %>%
@@ -91,10 +91,10 @@ ggplot(chloro, aes(long, lat)) +
 # Assumes a CSV file called submission_score.csv with the following coluns
 # submission_score, Positive, Negative
 
-submission.data <- read.csv("submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv", quote="", header=TRUE)
-plot(Positive~story_score, data=story.data, col='darkgreen', pch='.',
+story.data <- read.csv("submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv", quote="", header=TRUE)
+plot(Positive~submission_score, data=story.data, col='darkgreen', pch='.',
      main="Sentiment By Score on Submission")
-points(Negative~story_score, data=story.data, col='red', pch='.')
+points(Negative~submission_score, data=story.data, col='red', pch='.')
 
 
 ########################################

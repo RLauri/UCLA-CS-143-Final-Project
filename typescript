@@ -3229,4 +3229,270 @@ OSError: cannot locate /path_to/st99_d00.shp
 [01;34mcomment_score.csv[0m          [01;34mjoined_data.parquet[0m          [01;34mproject2[0m             [01;32mRplots.pdf[0m              [01;32mst99_d00.shx[0m          [01;34mtime_data.csv[0m
 [01;32mcomments-minimal.json.bz2[0m  [01;32mlabeled_data.csv[0m             [01;34m__pycache__[0m          [01;32mschema.txt[0m              [01;34mstate_data.csv[0m        [01;34mtop_neg_submissions.csv[0m
 [01;34mcomments.parquet[0m           [01;34mlabeled_data.parquet[0m         [01;34mraw_percentages.csv[0m  [01;34msentiment_data.parquet[0m  [01;34msubmission_score.csv[0m  [01;34mtop_pos_submissions.csv[0m
-]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ g
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git add -a[K-all 
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git commit -am "lots of stupid files" && git push
+][master c9b6ae3] lots of stupid files
+ 10 files changed, 3581 insertions(+), 506 deletions(-)
+ create mode 100644 Rplots.pdf
+ create mode 100644 analysis.py
+ create mode 100644 analysis.r
+ create mode 100644 part1.png
+ create mode 100644 state_data.csv/.part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv.crc
+ delete mode 100644 state_data.csv/.part-00000-ff316d38-b132-40e4-b16c-6b44dcbe5bd3-c000.csv.crc
+ create mode 100644 state_data.csv/part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv
+ delete mode 100644 state_data.csv/part-00000-ff316d38-b132-40e4-b16c-6b44dcbe5bd3-c000.csv
+ create mode 100644 typescript
+Username for 'https://github.com': RLauri
+Password for 'https://]RLauri@github.com': 
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/Apostolos-Delis/CS-143-Project-2b.git/'
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git commit -am "lots of stupid files" && git push
+On branch master
+Your branch is ahead of 'origin/master' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git push
+Username for 'https://github.com': RLauri
+Password for 'https://RLauri@github.com': 
+Enumerating objects: 14, done.
+Counting objects:   7% (1/14)   Counting objects:  14% (2/14)   Counting objects:  21% (3/14)   Counting objects:  28% (4/14)   Counting objects:  35% (5/14)   Counting objects:  42% (6/14)   Counting objects:  50% (7/14)   Counting objects:  57% (8/14)   Counting objects:  64% (9/14)   Counting objects:  71% (10/14)   Counting objects:  78% (11/14)   Counting objects:  85% (12/14)   Counting objects:  92% (13/14)   Counting objects: 100% (14/14)   Counting objects: 100% (14/14), done.
+Delta compression using up to 12 threads
+Compressing objects:  10% (1/10)   Compressing objects:  20% (2/10)   Compressing objects:  30% (3/10)   Compressing objects:  40% (4/10)   Compressing objects:  50% (5/10)   Compressing objects:  60% (6/10)   Compressing objects:  70% (7/10)   Compressing objects:  80% (8/10)   Compressing objects:  90% (9/10)   Compressing objects: 100% (10/10)   Compressing objects: 100% (10/10), done.
+Writing objects:   9% (1/11)   Writing objects:  18% (2/11)   Writing objects:  27% (3/11)   Writing objects:  36% (4/11)   Writing objects:  45% (5/11)   Writing objects:  54% (6/11)   Writing objects:  63% (7/11)   Writing objects:  72% (8/11)   Writing objects:  81% (9/11)   Writing objects:  90% (10/11)   Writing objects: 100% (11/11)   Writing objects: 100% (11/11), 65.88 KiB | 2.44 MiB/s, done.
+Total 11 (delta 2), reused 0 (delta 0)
+remote: Resolving deltas:   0% (0/2)   [Kremote: Resolving deltas:  50% (1/2)   [Kremote: Resolving deltas: 100% (2/2)   [Kremote: Resolving deltas: 100% (2/2), completed with 2 local objects.[K
+To https://github.com/Apostolos-Delis/CS-143-Project-2b.git
+   eb833f8..c9b6ae3  master -> master
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git pushcommit -am "lots of stupid files" && git pushadd --all [Kla[K./analysis.pyvim analysis../analysis.py
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ Rscript analysis.r 
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
+  no lines available in input
+Calls: read.csv -> read.table
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ Rscript analysis.r 
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Joining, by = "region"
+Error in eval(m$data, eframe) : object 'story.data' not found
+Calls: plot -> plot.formula -> eval -> eval
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim s
+schema.txt              spark-warehouse/        st99_d00.shp            state_data.csv/         submissions.json.bz2    
+sentiment_data.parquet/ st99_d00.dbf            st99_d00.shx            submission_score.csv/   submissions.parquet/    
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim sy[Ktate_data.csv/
+part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv       _SUCCESS
+.part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv.crc  ._SUCCESS.crc
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim state_data.csv/[[Kpart-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv 
+[?2004h[?1049h[22;0;0t[?1h=[?2004h[1;85r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[85;1H"state_data.csv/part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv" 51L, 2246C[2;1H▽[6n[2;1H  [1;1H[27m[23m[29m[m[H[2J[?25h[>c]10;?]11;?[?25l[1;1Hstate,Positive,Negative
+Utah,50.0,89.7196261682243
+Hawaii,46.07843137254902,89.2156862745098
+Minnesota,46.02169981916817,91.77215189873418
+Ohio,44.93865030674847,92.17791411042946
+Oregon,44.8405253283302,91.55722326454033
+Arkansas,41.46341463414634,92.6829268292683
+Texas,44.28317535545024,91.79502369668246
+North Dakota,40.27777777777778,91.66666666666666
+Pennsylvania,45.34124629080119,92.10682492581603
+Connecticut,40.94955489614243,89.61424332344214
+Nebraska,42.42424242424242,92.20779220779221
+Vermont,47.13375796178344,91.71974522292994
+Nevada,46.865671641791046,89.25373134328358
+Washington,44.56993918331885,92.70199826238054
+Illinois,46.92923898531375,91.0547396528705
+Oklahoma,43.75,93.359375
+Delaware,38.70967741935484,96.7741935483871
+Alaska,49.56521739130435,91.30434782608695
+New Mexico,51.26050420168067,90.75630252100841
+West Virginia,51.06382978723404,93.61702127659575
+Missouri,44.6843853820598,90.03322259136213
+Rhode Island,44.72049689440994,91.30434782608695
+Georgia,42.485875706214685,92.09039548022598
+Montana,47.25274725274725,93.4065934065934
+Virginia,42.73255813953488,92.92635658914729
+Michigan,45.994599459945995,90.81908190819082
+North Carolina,47.9285134037368,91.87652315190901
+Wyoming,45.45454545454545,94.8051948051948
+Kansas,46.788990825688074,91.13149847094802
+New Jersey,41.07997265892003,92.00273410799727
+Maryland,45.88155207624234,91.83117767188563
+Alabama,44.24552429667519,89.51406649616368
+Arizona,43.575418994413404,92.73743016759776
+Iowa,42.51968503937008,93.30708661417323
+Massachusetts,43.403590944574546,93.20843091334895
+Kentucky,46.00280504908836,91.72510518934082
+Louisiana,45.220588235294116,89.33823529411765
+Mississippi,43.35260115606936,91.32947976878613
+Tennessee,45.354523227383865,91.0757946210269
+New Hampshire,55.2,94.39999999999999
+Florida,45.475910693302,93.18448883666275
+Indiana,44.776119402985074,92.53731343283582
+Idaho,35.78947368421053,93.6842105263158
+South Carolina,50.57471264367817,93.10344827586206
+South Dakota,42.10526315789473,89.47368421052632
+California,46.350482315112544,91.86495176848875
+New York,43.93195943735689,93.22865554465162
+Wisconsin,44.53507340946166,91.51712887438825
+Colorado,43.859649122807014,92.6450742240216
+Maine,48.11715481171548,91.21338912133892
+[94m~                                                                                                                                                         [53;1H~                                                                                                                                                         [54;1H~                                                                                                                                                         [55;1H~                                                                                                                                                         [56;1H~                                                                                                                                                         [57;1H~                                                                                                                                                         [58;1H~                                                                                                                                                         [59;1H~                                                                                                                                                         [60;1H~                                                                                                                                                         [61;1H~                                                                                                                                                         [62;1H~                                                                                                                                                         [63;1H~                                                                                                                                                         [64;1H~                                                                                                                                                         [65;1H~                                                                                                                                                         [66;1H~                                                                                                                                                         [67;1H~                                                                                                                                                         [68;1H~                                                                                                                                                         [69;1H~                                                                                                                                                         [70;1H~                                                                                                                                                         [71;1H~                                                                                                                                                         [72;1H~                                                                                                                                                         [73;1H~                                                                                                                                                         [74;1H~                                                                                                                                                         [75;1H~                                                                                                                                                         [76;1H~                                                                                                                                                         [77;1H~                                                                                                                                                         [78;1H~                                                                                                                                                         [79;1H~                                                                                                                                                         [80;1H~                                                                                                                                                         [81;1H~                                                                                                                                                         [82;1H~                                                                                                                                                         [83;1H~                                                                                                                                                         [84;1H~                                                                                                                                                         [m[85;137H1,1[11CAll[1;1H[?25h[?25l[85;127H^[[1;1H[85;127H  [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;127H   [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;127H    [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;131H;[1;1H[85;127H     [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;131H;[1;1H[85;132H2[1;1H[85;127H      [1;1H[?25h[?25l[85;127H^[[1;1H[85;127H  [1;1H[85;127H^[[1;1H[85;127H  [1;1H[?25h[?25l[85;127H:[1;1H[85;127H[K[85;1H:[?2004h[?25hq[?25l[?25h![?25l[?25h[?25l[?2004l[23;2t[23;1t[22;2t[22;1t[23;2t[23;1t[85;1H[K[85;1H[?2004l[?1l>[?25h[?1049l[23;0;0t]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ [K]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim state_data.csv/part-00000-f6721959-48f4-4c0b-964b-7f2ff9a04095-c000.csv [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CRscript analysis.r [K
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Joining, by = "region"
+Error in eval(m$data, eframe) : object 'story.data' not found
+Calls: plot -> plot.formula -> eval -> eval
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim submission_score.csv/
+part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv       _SUCCESS
+.part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv.crc  ._SUCCESS.crc
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv 
+[?2004h[?1049h[22;0;0t[?1h=[?2004h[1;85r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[85;1H"submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv" 5271L, 183670C[2;1H▽[6n[2;1H  [1;1H[27m[23m[29m[m[H[2J[?25h[>c]10;?]11;?[?25l[1;1Hsubmission_score,Positive,Negative
+9968,51.143451143451145,87.11018711018711
+2040,34.0,88.0
+4823,51.31578947368421,89.47368421052632
+29,52.347417840375584,94.83568075117371
+8440,51.006711409395976,91.2751677852349
+2529,33.33333333333333,100.0
+26,52.04262877442274,91.65186500888099
+2214,47.875816993464056,87.74509803921569
+8075,48.97959183673469,100.0
+27919,50.68027210884354,89.45578231292517
+14719,50.0,88.46153846153845
+964,56.00000000000001,80.0
+38287,50.0,92.85714285714286
+17043,42.27642276422765,91.05691056910568
+3764,62.06896551724138,96.55172413793103
+1677,44.0,92.0
+474,46.875,87.5
+3091,46.15384615384615,76.92307692307693
+1950,37.93103448275862,96.55172413793103
+1806,27.27272727272727,100.0
+1697,42.10526315789473,94.73684210526315
+2453,58.333333333333336,100.0
+2250,50.0,100.0
+4590,42.857142857142854,100.0
+65,45.3551912568306,95.08196721311475
+3280,35.13513513513514,92.7927927927928
+1360,51.61290322580645,90.32258064516128
+3391,38.297872340425535,97.87234042553192
+191,57.407407407407405,98.14814814814815
+3009,46.42857142857143,89.28571428571429
+29695,50.56603773584906,95.84905660377359
+1840,52.38095238095239,95.23809523809523
+418,50.98039215686274,88.23529411764706
+3061,40.625,96.875
+5759,41.509433962264154,94.33962264150944
+541,52.5,95.0
+29913,37.41935483870968,93.2258064516129
+558,33.84615384615385,81.53846153846153
+7130,49.193548387096776,91.12903225806451
+1010,48.484848484848484,90.9090909090909
+10237,34.146341463414636,92.6829268292683
+1277,50.0,100.0
+5418,58.333333333333336,83.33333333333334
+2812,34.146341463414636,85.36585365853658
+3015,75.0,100.0
+9444,41.66666666666667,89.58333333333334
+11860,48.717948717948715,92.3076923076923
+3199,44.44444444444444,100.0
+3106,57.14285714285714,85.71428571428571
+2173,26.666666666666668,100.0
+2895,45.45454545454545,95.45454545454545
+1258,50.0,88.88888888888889
+5241,61.76470588235294,88.23529411764706
+3806,62.5,95.83333333333334
+5934,44.44444444444444,88.88888888888889
+4371,35.714285714285715,100.0
+1224,33.33333333333333,93.33333333333333
+3800,0.0,100.0
+3327,52.0,96.0
+56131,52.41935483870967,91.93548387096774
+2184,54.166666666666664,91.66666666666666
+21121,50.638297872340424,86.80851063829788
+4551,30.64516129032258,90.32258064516128
+293,52.04081632653062,93.87755102040816
+270,37.83783783783784,94.5945945945946
+7635,37.5,87.5
+13659,45.94594594594595,94.5945945945946
+5148,51.724137931034484,89.65517241379311
+222,38.46153846153847,98.46153846153847
+730,46.15384615384615,88.46153846153845
+3155,56.25,87.5
+6675,48.97959183673469,91.83673469387756
+1145,38.88888888888889,88.88888888888889
+1371,58.333333333333336,87.5
+2517,30.555555555555557,93.05555555555556
+2570,34.61538461538461,92.3076923076923
+3845,27.27272727272727,100.0
+1642,50.0,90.0
+1127,50.0,100.0
+5079,50.0,91.66666666666666
+2909,42.857142857142854,92.85714285714286
+2989,50.0,100.0
+2581,66.66666666666666,100.0[85;137H1,1[11CTop[1;1H[?25h[?25l[85;127H^[[1;1H[85;127H  [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;127H   [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;127H    [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;131H;[1;1H[85;127H     [1;1H[85;127H^[[1;1H[85;129H[[1;1H[85;130H2[1;1H[85;131H;[1;1H[85;132H2[1;1H[85;127H      [1;1H[?25h[?25l[85;127H^[[1;1H[85;127H  [1;1H[85;127H^[[1;1H[85;127H  [1;1H[?25h[?25l[85;127H:[1;1H[85;127H[K[85;1H:[?2004h[?25hq[?25l[?25h![?25l[?25h[?25l[?2004l[23;2t[23;1t[22;2t[22;1t[23;2t[23;1t[85;1H[K[85;1H[?2004l[?1l>[?25h[?1049l[23;0;0t]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ [K]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ vim submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CRscript analysis.r [K
+Error in (function (file = if (onefile) "Rplots.pdf" else "Rplot%03d.pdf",  : 
+  cannot open file 'Rplots.pdf'
+Calls: ts.plot ... do.call -> plot.ts -> plotts -> plot.new -> <Anonymous>
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ s;[K[Kls
+[0m[01;32manalysis.py[0m                  [01;34mjoined_data.parquet[0m   [01;32mplot5a.png[0m           [01;34mresult.parquet[0m          [01;32mst99_d00.shx[0m          [01;34mtop_neg_submissions.csv[0m
+[01;32manalysis.r[0m                   [01;32mlabeled_data.csv[0m      [01;32mplot5b.png[0m           [01;32mRplots.pdf[0m              [01;34mstate_data.csv[0m        [01;34mtop_pos_submissions.csv[0m
+[01;32mcleantext.py[0m                 [01;34mlabeled_data.parquet[0m  [01;34mproject2[0m             [01;32mschema.txt[0m              [01;34msubmission_score.csv[0m  [01;32mtypescript[0m
+[01;34mcomment_score.csv[0m            [01;32mmycoolmap.png[0m         [01;34m__pycache__[0m          [01;34msentiment_data.parquet[0m  [01;32msubmissions.json.bz2[0m
+[01;32mcomments-minimal.json.bz2[0m    [01;34mngrams.parquet[0m        [01;34mraw_percentages.csv[0m  [01;34mspark-warehouse[0m         [01;34msubmissions.parquet[0m
+[01;34mcomments.parquet[0m             [01;32mparquet_maker.py[0m      [01;32mREADME.txt[0m           [01;32mst99_d00.dbf[0m            [01;32mteam.txt[0m
+[01;34mfull_sentiment_data.parquet[0m  [01;32mpart1.png[0m             [01;32mreddit_model.py[0m      [01;32mst99_d00.shp[0m            [01;34mtime_data.csv[0m
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ mv Rplots.pdf R[Kbackup.pdf
+mv: cannot move 'Rplots.pdf' to 'backup.pdf': Text file busy
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ mv Rplots.pdf backup.pdf
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ mv Rplots.pdf backup.pdfls[KRscript analysis.r [63@vim submission_score.csv/part-00000-4c727b3f-de27-4a56-8cbb-2e976a8848e1-c000.csv[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CRscript analysis.r [K
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Joining, by = "region"
+Error in eval(m$data, eframe) : object 'story.data' not found
+Calls: plot -> plot.formula -> eval -> eval
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ ls
+[0m[01;32manalysis.py[0m                [01;34mcomments.parquet[0m             [01;34mngrams.parquet[0m    [01;34m__pycache__[0m          [01;32mschema.txt[0m              [01;34mstate_data.csv[0m        [01;34mtop_neg_submissions.csv[0m
+[01;32manalysis.r[0m                 [01;34mfull_sentiment_data.parquet[0m  [01;32mparquet_maker.py[0m  [01;34mraw_percentages.csv[0m  [01;34msentiment_data.parquet[0m  [01;34msubmission_score.csv[0m  [01;34mtop_pos_submissions.csv[0m
+[01;32mbackup.pdf[0m                 [01;34mjoined_data.parquet[0m          [01;32mpart1.png[0m         [01;32mREADME.txt[0m           [01;34mspark-warehouse[0m         [01;32msubmissions.json.bz2[0m  [01;32mtypescript[0m
+[01;32mcleantext.py[0m               [01;32mlabeled_data.csv[0m             [01;32mplot5a.png[0m        [01;32mreddit_model.py[0m      [01;32mst99_d00.dbf[0m            [01;34msubmissions.parquet[0m
+[01;34mcomment_score.csv[0m          [01;34mlabeled_data.parquet[0m         [01;32mplot5b.png[0m        [01;34mresul
