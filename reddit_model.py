@@ -364,6 +364,7 @@ FROM full_sentiment_data
 GROUP BY date
 ORDER BY date"""
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_2 = context.sql(percent_by_day_sql)
     # task10_2.show()
     if os.path.isdir("time_data.csv"):
@@ -376,33 +377,51 @@ ORDER BY date"""
                              BooleanType())
     task10_3_sql = """
 SELECT
-    author_flair_text AS state,
+    state AS state,
     AVG(pos) AS Positive,
     AVG(neg) AS Negative
 FROM full_sentiment_data
-WHERE (valid_state(author_flair_text))
-GROUP BY author_flair_text
+WHERE (valid_state(state))
+GROUP BY state
     """
+    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_3 = context.sql(task10_3_sql)
+    if os.path.isdir("state_data.csv"):
+        shutil.rmtree("state_data.csv")
+    task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("state_data.csv")
 
     # part 4
     task_10_4_sql_submission = """
 SELECT
     submission_score,
     AVG(pos) AS Positive,
-    AVG(neg) AS Negative,
+    AVG(neg) AS Negative
 FROM full_sentiment_data
+GROUP BY submission_score
     """
 
     task_10_4_sql_comment = """
 SELECT
     comment_score,
     AVG(pos) AS Positive,
-    AVG(neg) AS Negative,
+    AVG(neg) AS Negative
 FROM full_sentiment_data
+GROUP BY comment_score
     """
+    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    full_sentiment_data.printSchema()
+    full_sentiment_data.show()
+
     percent_submission = context.sql(task_10_4_sql_submission)
+    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     percent_comment = context.sql(task_10_4_sql_comment)
+
+    if os.path.isdir("submission_score.csv"):
+        shutil.rmtree("submission_score.csv")
+    percent_submission.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("submission_score.csv")
+    if os.path.isdir("comment_score.csv"):
+        shutil.rmtree("comment_score.csv")
+    percent_comment.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("comment_score.csv")
 
 
 if __name__ == "__main__":
