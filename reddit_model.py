@@ -231,6 +231,11 @@ def main(context):
     # task 6A
     result_full_data = model.transform(sanitized_full_comments)
 
+    # classification part of task 9
+    pos_result = pos_model.transform(result_full_data)
+    pos_result.show()
+    neg_result = neg_model.transform(result_full_data)
+    neg_result.show()
 
 
 if __name__ == "__main__":
