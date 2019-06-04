@@ -3,12 +3,12 @@ from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext
 # TODO: Check to see if we need this
 # from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType, ArrayType, BooleanType
+from pyspark.sql.types import StringType, ArrayType, BooleanType, FloatType
 from pyspark.ml.feature import CountVectorizer
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.tuning import CrossValidator, CrossValidatorModel, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
-from pyspark.sql.functions import ltrim
+from pyspark.sql.functions import ltrim, element_at
 from py4j.protocol import Py4JJavaError
 import os
 
@@ -63,7 +63,7 @@ def generate_full_comments_data(submissions, comments, context):
 
     full_comment_join_sql = """
 SELECT
-    comments.link_id AS comment_id,
+    comments.id AS comment_id,
     comments.body AS body,
     comments.created_utc AS timestamp,
     comments.author_flair_text AS state,
@@ -96,9 +96,10 @@ def main(context):
 	
     # TASK 1
     if os.path.isdir("comments.parquet") and os.path.isdir("submissions.parquet") and os.path.isdir("labeled_data.parquet"):
-        comments = context.read.parquet("comments.parquet")
-        submissions = context.read.parquet("submissions.parquet")
-        labeled_data = context.read.parquet("labeled_data.parquet")
+        print("WE HERE")
+        comments = context.read.parquet("comments.parquet").sample(False, 0.2 , None)
+        submissions = context.read.parquet("submissions.parquet").sample(False, 0.2 , None)
+        labeled_data = context.read.parquet("labeled_data.parquet").sample(False, 0.2 , None)
     else:
         comments = context.read.json("comments-minimal.json.bz2")
         comments.write.parquet("comments.parquet")
@@ -226,17 +227,65 @@ def main(context):
 
     # task 5 redone
     sanitized_full_comments = generate_sanitized_full_comments(context, full_comments_data)
-    sanitized_full_comments.show()
+    # sanitized_full_comments.show()
 
     # task 6A
     result_full_data = model.transform(sanitized_full_comments)
-    result_full_data.show()
+    # result_full_data.show()
+
     # classification part of task 9
     pos_result = pos_model.transform(result_full_data)
     pos_result.show()
     neg_result = neg_model.transform(result_full_data)
     neg_result.show()
 
+    # probability threshold application from task 9
+    if os.path.isdir("full_sentiment_data.parquet"):
+        full_sentiment_data = context.read.parquet("full_sentiment_data.parquet")
+    else:
+        context.registerFunction("first_element", lambda x: float(x[1]), FloatType())
+        threshold_sql = """
+    SELECT
+        a.comment_id AS comment_id,
+        a.timestamp AS timestamp,
+        a.state AS state,
+        a.title AS title,
+        if (first_element(a.probability) > 0.2, 1, 0) AS pos,
+        if (first_element(b.probability) > 0.25, 1, 0) AS neg
+    FROM pos_result a
+    INNER JOIN neg_result b ON a.comment_id = b.comment_id
+    """
+        pos_result.createOrReplaceTempView("pos_result")
+        neg_result.createOrReplaceTempView("neg_result")
+        pos_result.printSchema()
+        full_sentiment_data = context.sql(threshold_sql)
+        full_sentiment_data.write.parquet("full_sentiment_data.parquet")
+        # full_sentiment_data.show()
+    full_sentiment_data.show(20, False)
+
+    # TASK 10
+
+    # part 1
+    percent_sql = """
+SELECT
+    AVG(pos) * 100.0 AS pos_percentage,
+    AVG(neg) * 100.0 AS neg_percentage
+FROM full_sentiment_data"""
+    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    task10_1 = context.sql(percent_sql)
+    task10_1.show()
+
+    # part 2
+    percent_by_day_sql = """
+SELECT
+    FROM_UNIXTIME(timestamp, 'YYYY-MM-dd') AS date,
+    AVG(pos) * 100.0 AS pos_percentage,
+    AVG(neg) * 100.0 AS neg_percentage
+FROM full_sentiment_data
+GROUP BY date"""
+    # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    task10_2 = context.sql(percent_by_day_sql)
+    task10_2.show()
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("CS143 Project 2B")
