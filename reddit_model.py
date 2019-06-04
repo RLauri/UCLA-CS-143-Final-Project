@@ -93,156 +93,168 @@ FROM full_comments_data"""
 
 def main(context):
     """Main function takes a Spark SQL context."""
-	
-    # TASK 1
-    if os.path.isdir("comments.parquet") and os.path.isdir("submissions.parquet") and os.path.isdir("labeled_data.parquet"):
-        # print("WE HERE")
-        comments = context.read.parquet("comments.parquet").sample(False, 0.2 , None)
-        submissions = context.read.parquet("submissions.parquet").sample(False, 0.2 , None)
-        labeled_data = context.read.parquet("labeled_data.parquet").sample(False, 0.2 , None)
+	# skips to task 10 if results from 9 are stored
+    if os.path.isfile("full_sentiment_data.parquet/._SUCCESS.crc"):
+        full_sentiment_data = context.read.parquet("full_sentiment_data.parquet")
     else:
-        comments = context.read.json("comments-minimal.json.bz2")
-        comments.write.parquet("comments.parquet")
+        # TASK 1
+        if os.path.isfile("comments.parquet/._SUCCESS.crc") and os.path.isfile("submissions.parquet/._SUCCESS.crc") and os.path.isfile("labeled_data.parquet/._SUCCESS.crc"):
+            # print("WE HERE")
+            comments = context.read.parquet("comments.parquet")
+            submissions = context.read.parquet("submissions.parquet")
+            labeled_data = context.read.parquet("labeled_data.parquet")
+        else:
+            comments = context.read.json("comments-minimal.json.bz2")
+            comments.write.parquet("comments.parquet")
 
-        submissions = context.read.json("submissions.json.bz2")
-        submissions.write.parquet("submissions.parquet")
+            submissions = context.read.json("submissions.json.bz2")
+            submissions.write.parquet("submissions.parquet")
 
-        labeled_data.write.parquet("labeled_data.parquet") 
-        labeled_data = context.read.csv("labeled_data.csv", header='true')
+            labeled_data = context.read.csv("labeled_data.csv", header='true')
+            labeled_data.write.parquet("labeled_data.parquet") 
 
-    # Create temporary views for later
-    comments.createGlobalTempView("comments")
-    labeled_data.createGlobalTempView("labeled_data")
-    submissions.createGlobalTempView("submissions")
-
-    if os.path.isdir("ngrams.parquet"):
-        ngrams = context.read.parquet("ngrams.parquet")
-    else:
+        # Create temporary views for later
+        comments.createGlobalTempView("comments")
+        labeled_data.createGlobalTempView("labeled_data")
+        submissions.createGlobalTempView("submissions")
 
         # TASK 4
         context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
 
         # TASK 5
-        joined_data = generate_joined_data(labeled_data, comments, context)
-        joined_data.createOrReplaceTempView("joined_data")
+        if os.path.isfile("joined_data.parquet/._SUCCESS.crc"):
+            joined_data = context.read.parquet("joined_data.parquet")
+        else:
+            joined_data = generate_joined_data(labeled_data, comments, context)
+            joined_data.write.parquet("joined_data.parquet")
 
-        ngram_sql = """
-    SELECT 
-        Input_id,
-        labeldem,
-        labelgop,
-        labeldjt,
-        sanitize(body) AS body
-    FROM joined_data"""
+        # code to run sanitize on joined data
+        if os.path.isfile("ngrams.parquet/._SUCCESS.crc"):
+            ngrams = context.read.parquet("ngrams.parquet")
+        else:
+            joined_data.createOrReplaceTempView("joined_data")
 
-        ngrams = context.sql(ngram_sql)
-        ngrams.write.parquet("ngrams.parquet")
+            ngram_sql = """
+        SELECT 
+            Input_id,
+            labeldem,
+            labelgop,
+            labeldjt,
+            sanitize(body) AS body
+        FROM joined_data"""
 
-    # TASK 6A
-    # REFERENCE:
-    # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
+            ngrams = context.sql(ngram_sql)
+            ngrams.write.parquet("ngrams.parquet")
 
-    vectorizer = CountVectorizer(inputCol="body",
-                                outputCol="features",
-                                minDF=MIN_DF,
-                                binary=True)
-    model = vectorizer.fit(ngrams)
+        # TASK 6A
+        # REFERENCE:
+        # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
+        # couldn't figure out how to save this simply, so it always has to be ran? Ah well, was fast to run ¯\_(ツ)_/¯
+        vectorizer = CountVectorizer(inputCol="body",
+                                    outputCol="features",
+                                    minDF=MIN_DF,
+                                    binary=True)
+        model = vectorizer.fit(ngrams)
 
-    # TASK 6B
-    if os.path.isdir("result.parquet"):
-        result = context.read.parquet("result.parquet")
-    else:
-        result = model.transform(ngrams)
-        result.write.parquet("result.parquet")
-    
+        # TASK 6B
+        if os.path.isdir("result.parquet"):
+            result = context.read.parquet("result.parquet")
+        else:
+            result = model.transform(ngrams)
+            result.write.parquet("result.parquet")
+        
 
-    if os.path.isdir("sentiment_data.parquet"):
-        sentiment_data = context.read.parquet("sentiment_data.parquet")
-    else:
-        djt_sentiment_sql = """
-    SELECT
-        *,
-        if (labeldjt = 1, 1, 0) AS pos_label,
-        if (labeldjt = -1, 1, 0) AS neg_label
-    FROM result"""
-        result.createOrReplaceTempView("result")
-        sentiment_data = context.sql(djt_sentiment_sql)
-        sentiment_data.write.parquet("sentiment_data.parquet")
-        # sentiment_data.show()
+        if os.path.isdir("sentiment_data.parquet"):
+            sentiment_data = context.read.parquet("sentiment_data.parquet")
+        else:
+            djt_sentiment_sql = """
+        SELECT
+            *,
+            if (labeldjt = 1, 1, 0) AS pos_label,
+            if (labeldjt = -1, 1, 0) AS neg_label
+        FROM result"""
+            result.createOrReplaceTempView("result")
+            sentiment_data = context.sql(djt_sentiment_sql)
+            sentiment_data.write.parquet("sentiment_data.parquet")
+            # sentiment_data.show()
 
+        # TASK 7
+        if os.path.isfile("project2/pos.model/bestModel/data/._SUCCESS.crc") and os.path.isfile("project2/neg.model/bestModel/data/._SUCCESS.crc"):
+            pos_model = CrossValidatorModel.load("project2/pos.model")
+            neg_model = CrossValidatorModel.load("project2/neg.model")
+        else:
+            # Initialize two logistic regression models.
+            # Replace labelCol with the column containing the label, and featuresCol with the column containing the features.
+            poslr = LogisticRegression(labelCol="pos_label", featuresCol="features", maxIter=10)
+            neglr = LogisticRegression(labelCol="neg_label", featuresCol="features", maxIter=10)
+            # This is a binary classifier so we need an evaluator that knows how to deal with binary classifiers.
+            posEvaluator = BinaryClassificationEvaluator(labelCol="pos_label")
+            negEvaluator = BinaryClassificationEvaluator(labelCol="neg_label")
+            # There are a few parameters associated with logistic regression. We do not know what they are a priori.
+            # We do a grid search to find the best parameters. We can replace [1.0] with a list of values to try.
+            # We will assume the parameter is 1.0. Grid search takes forever.
+            posParamGrid = ParamGridBuilder().addGrid(poslr.regParam, [1.0]).build()
+            negParamGrid = ParamGridBuilder().addGrid(neglr.regParam, [1.0]).build()
+            # We initialize a 5 fold cross-validation pipeline.
+            posCrossval = CrossValidator(
+                estimator=poslr,
+                evaluator=posEvaluator,
+                estimatorParamMaps=posParamGrid,
+                numFolds=5)
+            negCrossval = CrossValidator(
+                estimator=neglr,
+                evaluator=negEvaluator,
+                estimatorParamMaps=negParamGrid,
+                numFolds=5)
+            # Although crossvalidation creates its own train/test sets for
+            # tuning, we still need a labeled test set, because it is not
+            # accessible from the crossvalidator (argh!)
+            # Split the data 50/50
+            posTrain, posTest = sentiment_data.randomSplit([0.5, 0.5])
+            negTrain, negTest = sentiment_data.randomSplit([0.5, 0.5])
+            # Train the models
+            print("Training positive classifier...")
+            pos_model = posCrossval.fit(posTrain)
+            print("Training negative classifier...")
+            neg_model = negCrossval.fit(negTrain)
 
-    # TASK 7
-    # Initialize two logistic regression models.
-    # Replace labelCol with the column containing the label, and featuresCol with the column containing the features.
-    if os.path.isdir("project2/pos.model") and os.path.isdir("project2/neg.model"):
-        pos_model = CrossValidatorModel.load("project2/pos.model")
-        neg_model = CrossValidatorModel.load("project2/neg.model")
-    else:
-        poslr = LogisticRegression(labelCol="pos_label", featuresCol="features", maxIter=10)
-        neglr = LogisticRegression(labelCol="neg_label", featuresCol="features", maxIter=10)
-        # This is a binary classifier so we need an evaluator that knows how to deal with binary classifiers.
-        posEvaluator = BinaryClassificationEvaluator(labelCol="pos_label")
-        negEvaluator = BinaryClassificationEvaluator(labelCol="neg_label")
-        # There are a few parameters associated with logistic regression. We do not know what they are a priori.
-        # We do a grid search to find the best parameters. We can replace [1.0] with a list of values to try.
-        # We will assume the parameter is 1.0. Grid search takes forever.
-        posParamGrid = ParamGridBuilder().addGrid(poslr.regParam, [1.0]).build()
-        negParamGrid = ParamGridBuilder().addGrid(neglr.regParam, [1.0]).build()
-        # We initialize a 5 fold cross-validation pipeline.
-        posCrossval = CrossValidator(
-            estimator=poslr,
-            evaluator=posEvaluator,
-            estimatorParamMaps=posParamGrid,
-            numFolds=5)
-        negCrossval = CrossValidator(
-            estimator=neglr,
-            evaluator=negEvaluator,
-            estimatorParamMaps=negParamGrid,
-            numFolds=5)
-        # Although crossvalidation creates its own train/test sets for
-        # tuning, we still need a labeled test set, because it is not
-        # accessible from the crossvalidator (argh!)
-        # Split the data 50/50
-        posTrain, posTest = sentiment_data.randomSplit([0.5, 0.5])
-        negTrain, negTest = sentiment_data.randomSplit([0.5, 0.5])
-        # Train the models
-        print("Training positive classifier...")
-        pos_model = posCrossval.fit(posTrain)
-        print("Training negative classifier...")
-        neg_model = negCrossval.fit(negTrain)
+            # Once we train the models, we don't want to do it again. We can save the models and load them again later.
+            pos_model.save("project2/pos.model")
+            neg_model.save("project2/neg.model")
 
-        # Once we train the models, we don't want to do it again. We can save the models and load them again later.
-        pos_model.save("project2/pos.model")
-        neg_model.save("project2/neg.model")
+        # TASK 8
+        # had to downsample because of RAM issues, seemed like the correct place to do it albeit a little redundant reloading
+        # (Windows ate up way too much RAM on the desktop we used, and both of our laptops are too much of potatoes to run any of this)
+        comments = context.read.parquet("comments.parquet").sample(False, 0.2 , None)
+        submissions = context.read.parquet("submissions.parquet").sample(False, 0.2 , None)
 
-    # TASK 8
-    full_comments_data = generate_full_comments_data(submissions, comments, context)
-    # full_comments_data.filter("state is not null").show()
+        comments.createOrReplaceTempView("comments")
+        submissions.createOrReplaceTempView("submissions")
 
-    # TASK 9
+        full_comments_data = generate_full_comments_data(submissions, comments, context)
+        # full_comments_data.filter("state is not null").show()
 
-    # task 4 redone
-    # reregisters function in case of exception not happening for previous task 4
-    context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
+        # TASK 9
 
-    # task 5 redone
-    sanitized_full_comments = generate_sanitized_full_comments(context, full_comments_data)
-    # sanitized_full_comments.show()
+        # task 4 redone
+        # reregisters function in case of exception not happening for previous task 4
+        context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
 
-    # task 6A
-    result_full_data = model.transform(sanitized_full_comments)
-    # result_full_data.show()
+        # task 5 redone
+        sanitized_full_comments = generate_sanitized_full_comments(context, full_comments_data)
+        # sanitized_full_comments.show()
 
-    # classification part of task 9
-    pos_result = pos_model.transform(result_full_data)
-    # pos_result.show()
-    neg_result = neg_model.transform(result_full_data)
-    # neg_result.show()
+        # task 6A
+        result_full_data = model.transform(sanitized_full_comments)
+        # result_full_data.show()
 
-    # probability threshold application from task 9
-    if os.path.isdir("full_sentiment_data.parquet"):
-        full_sentiment_data = context.read.parquet("full_sentiment_data.parquet")
-    else:
+        # classification part of task 9
+        pos_result = pos_model.transform(result_full_data)
+        # pos_result.show()
+        neg_result = neg_model.transform(result_full_data)
+        # neg_result.show()
+
+        # probability threshold application from task 9
         context.registerFunction("first_element", lambda x: float(x[1]), FloatType())
         threshold_sql = """
     SELECT
@@ -262,8 +274,8 @@ def main(context):
         full_sentiment_data = context.sql(threshold_sql)
         full_sentiment_data.write.parquet("full_sentiment_data.parquet")
         # full_sentiment_data.show()
-    # full_sentiment_data.show(20, False)
-    # exit(1)
+        # full_sentiment_data.show(20, False)
+        # exit(1)
 
     # TASK 10
 
@@ -292,7 +304,7 @@ ORDER BY date"""
     # task10_2.show()
     task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_2.csv")
 
-    # part 3
+    # part 4
 
 
 if __name__ == "__main__":
