@@ -10,7 +10,7 @@ from pyspark.ml.tuning import CrossValidator, CrossValidatorModel, ParamGridBuil
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.sql.functions import ltrim
 from py4j.protocol import Py4JJavaError
-
+import os
 
 from cleantext import sanitize 
 
@@ -95,11 +95,11 @@ def main(context):
     """Main function takes a Spark SQL context."""
 	
     # TASK 1
-    try:
+    if os.path.isdir("comments.parquet"):
         comments = context.read.parquet("comments.parquet")
         submissions = context.read.parquet("submissions.parquet")
         labeled_data = context.read.parquet("labeled_data.parquet")
-    except (Py4JJavaError, FileNotFoundError) as e:
+    else:
         comments = context.read.json("comments-minimal.json.bz2")
         comments.write.parquet("comments.parquet")
 
@@ -114,9 +114,9 @@ def main(context):
     labeled_data.createGlobalTempView("labeled_data")
     submissions.createGlobalTempView("submissions")
 
-    try:
-        sentiment_data = context.read.parquet("sentiment_data.parquet")
-    except (Py4JJavaError, FileNotFoundError) as e:
+    if os.path.isdir("ngrams.parquet"):
+        ngrams = context.read.parquet("ngrams.parquet")
+    else:
 
         # TASK 4
         context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
@@ -135,27 +135,36 @@ def main(context):
     FROM joined_data"""
 
         ngrams = context.sql(ngram_sql)
+        ngrams.write.parquet("ngrams.parquet")
 
-        # TASK 6A
-        # REFERENCE:
-        # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
+    # TASK 6A
+    # REFERENCE:
+    # https://spark.apache.org/docs/latest/ml-features.html#countvectorizer
 
-        vectorizer = CountVectorizer(inputCol="body",
-                                    outputCol="features",
-                                    minDF=MIN_DF,
-                                    binary=True)
-        model = vectorizer.fit(ngrams)
+    vectorizer = CountVectorizer(inputCol="body",
+                                outputCol="features",
+                                minDF=MIN_DF,
+                                binary=True)
+    model = vectorizer.fit(ngrams)
 
-        # TASK 6B
+    # TASK 6B
+    if os.path.isdir("result.parquet"):
+        result = context.read.parquet("result.parquet")
+    else:
         result = model.transform(ngrams)
-        result.createOrReplaceTempView("result")
+        result.write.parquet("result.parquet")
+    
 
+    if os.path.isdir("sentiment_data.parquet"):
+        sentiment_data = context.read.parquet("sentiment_data.parquet")
+    else:
         djt_sentiment_sql = """
     SELECT
         *,
         if (labeldjt = 1, 1, 0) AS pos_label,
         if (labeldjt = -1, 1, 0) AS neg_label
     FROM result"""
+        result.createOrReplaceTempView("result")
         sentiment_data = context.sql(djt_sentiment_sql)
         sentiment_data.write.parquet("sentiment_data.parquet")
         # sentiment_data.show()
@@ -164,10 +173,10 @@ def main(context):
     # TASK 7
     # Initialize two logistic regression models.
     # Replace labelCol with the column containing the label, and featuresCol with the column containing the features.
-    try:
+    if os.path.isdir("project2/pos.model"):
         pos_model = CrossValidatorModel.load("project2/pos.model")
         neg_model = CrossValidatorModel.load("project2/neg.model")
-    except (Py4JJavaError, FileNotFoundError) as e:
+    else:
         poslr = LogisticRegression(labelCol="pos_label", featuresCol="features", maxIter=10)
         neglr = LogisticRegression(labelCol="neg_label", featuresCol="features", maxIter=10)
         # This is a binary classifier so we need an evaluator that knows how to deal with binary classifiers.
