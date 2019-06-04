@@ -11,6 +11,7 @@ from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.sql.functions import ltrim, element_at
 from py4j.protocol import Py4JJavaError
 import os
+import shutil
 
 from cleantext import sanitize 
 
@@ -282,27 +283,31 @@ def main(context):
     # part 1
     percent_sql = """
 SELECT
-    AVG(pos) * 100.0 AS pos_percentage,
-    AVG(neg) * 100.0 AS neg_percentage
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
 FROM full_sentiment_data"""
     full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_1 = context.sql(percent_sql)
     # task10_1.show()
-    task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_1.csv")
+    if os.path.isdir("raw_percentages.csv"):
+        shutil.rmtree("raw_percentages.csv")
+    task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("raw_percentages.csv")
     
     # part 2
     percent_by_day_sql = """
 SELECT
     FROM_UNIXTIME(timestamp, 'YYYY-MM-dd') AS date,
-    AVG(pos) * 100.0 AS pos_percentage,
-    AVG(neg) * 100.0 AS neg_percentage
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
 FROM full_sentiment_data
 GROUP BY date
 ORDER BY date"""
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_2 = context.sql(percent_by_day_sql)
     # task10_2.show()
-    task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_2.csv")
+    if os.path.isdir("time_data.csv"):
+        shutil.rmtree("time_data.csv")
+    task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("time_data.csv")
 
     # part 4
 
