@@ -336,7 +336,7 @@ def main(context):
         full_sentiment_data = context.sql(threshold_sql)
         full_sentiment_data.write.parquet("full_sentiment_data.parquet")
         # full_sentiment_data.show()
-        full_sentiment_data.show(20, False)
+        # full_sentiment_data.show(20, False)
         # exit(1)
 
     # TASK 10
@@ -364,7 +364,6 @@ FROM full_sentiment_data
 GROUP BY date
 ORDER BY date"""
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
-    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_2 = context.sql(percent_by_day_sql)
     # task10_2.show()
     if os.path.isdir("time_data.csv"):
@@ -378,13 +377,13 @@ ORDER BY date"""
     task10_3_sql = """
 SELECT
     state AS state,
-    AVG(pos) AS Positive,
-    AVG(neg) AS Negative
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
 FROM full_sentiment_data
 WHERE (valid_state(state))
 GROUP BY state
     """
-    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_3 = context.sql(task10_3_sql)
     if os.path.isdir("state_data.csv"):
         shutil.rmtree("state_data.csv")
@@ -394,8 +393,8 @@ GROUP BY state
     task_10_4_sql_submission = """
 SELECT
     submission_score,
-    AVG(pos) AS Positive,
-    AVG(neg) AS Negative
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
 FROM full_sentiment_data
 GROUP BY submission_score
     """
@@ -403,17 +402,15 @@ GROUP BY submission_score
     task_10_4_sql_comment = """
 SELECT
     comment_score,
-    AVG(pos) AS Positive,
-    AVG(neg) AS Negative
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
 FROM full_sentiment_data
 GROUP BY comment_score
     """
-    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
-    full_sentiment_data.printSchema()
-    full_sentiment_data.show()
+    # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
 
     percent_submission = context.sql(task_10_4_sql_submission)
-    full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
+    # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     percent_comment = context.sql(task_10_4_sql_comment)
 
     if os.path.isdir("submission_score.csv"):
@@ -422,6 +419,43 @@ GROUP BY comment_score
     if os.path.isdir("comment_score.csv"):
         shutil.rmtree("comment_score.csv")
     percent_comment.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("comment_score.csv")
+
+    # FOR 4 in, to get the top ten pos and neg submissions
+    top_pos_submissions_sql =  """
+SELECT
+    submission_id,
+    submission_score,
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
+FROM full_sentiment_data
+GROUP BY submission_score, submission_id
+ORDER BY Positive DESC
+LIMIT 10
+    """
+
+    top_neg_submissions_sql =  """
+SELECT
+    submission_id,
+    submission_score,
+    AVG(pos) * 100.0 AS Positive,
+    AVG(neg) * 100.0 AS Negative
+FROM full_sentiment_data
+GROUP BY submission_score, submission_id
+ORDER BY Negative DESC
+LIMIT 10
+    """
+    # full_sentiment_data.show()
+    top_pos_submissions = context.sql(top_pos_submissions_sql)
+    # top_pos_submissions.show()
+
+    top_neg_submissions = context.sql(top_neg_submissions_sql)
+    # top_neg_submissions.show()
+    if os.path.isdir("top_pos_submissions.csv"):
+        shutil.rmtree("top_pos_submissions.csv")
+    top_pos_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_pos_submissions.csv")
+    if os.path.isdir("top_neg_submissions.csv"):
+        shutil.rmtree("top_neg_submissions.csv")
+    top_neg_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_neg_submissions.csv")
 
 
 if __name__ == "__main__":
