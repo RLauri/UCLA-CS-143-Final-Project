@@ -29,42 +29,10 @@ own separate table.
 
 Question 3:
 
-Pick one of the joins that you execute for this project. Rerun the join with .explain() attached 
-to it. Include the output. What do you notice? Explain what Spark SQL is doing during the join. 
+Pick one of the joins that you execute for this project. Rerun the join with .explain() attached
+to it. Include the output. What do you notice? Explain what Spark SQL is doing during the join.
 Which join algorithm does Spark seem to be using?
 
-== Physical Plan ==                                                                                                                                                                                                                                                                                                         
-*(10) Project [comment_id#276, timestamp#278L, state#279, title#106, if ((cast(pythonUDF0#407 as double) > 0.2)) 1 else 0 AS pos#377, if ((cast(pythonUDF1#408 as double) > 0.25)) 1 else 0 AS neg#378]                                                                                                                     
-+- BatchEvalPython [first_element(probability#309), first_element(probability#345)], [comment_id#276, probability#309, probability#345, state#279, timestamp#278L, title#106, pythonUDF0#407, pythonUDF1#408]                                                                                                                  
-    +- *(9) Project [comment_id#276, probability#309, probability#345, state#279, timestamp#278L, title#106]                                                                                                                                                                                                                      
-        +- *(9) SortMergeJoin [comment_id#276], [comment_id#392], Inner                                                                                                                                                                                                                                                                
-            :- *(4) Sort [comment_id#276 ASC NULLS FIRST], false, 0                                                                                                                                                                                                                                                                     
-            :  +- Exchange hashpartitioning(comment_id#276, 200)                                                                                                                                                                                                                                                                        
-            :     +- *(3) Project [id#14 AS comment_id#276, created_utc#10L AS timestamp#278L, author_flair_text#3 AS state#279, title#106, UDF(UDF(UDF(pythonUDF0#405))) AS probability#309]                                                                                                                                           
-            :        +- BatchEvalPython [sanitize(body#4)], [author_flair_text#3, body#4, created_utc#10L, id#14, title#106, pythonUDF0#405]                                                                                                                                                                                            
-            :           +- *(2) Project [author_flair_text#3, body#4, created_utc#10L, id#14, title#106]                                                                                                                                                                                                                                
-            :              +- *(2) BroadcastHashJoin [ltrim(link_id#16, Some(t3_))], [id#69], Inner, BuildRight                                                                                                                                                                                                                         
-            :                 :- *(2) Filter (((isnotnull(body#4) && NOT Contains(body#4, /s)) && NOT StartsWith(body#4, &gt)) && isnotnull(id#14))                                                                                                                                                                                                     
-            :                 :  +- *(2) Sample 0.0, 0.2, false, -5607937167649919925                                                                                                                                                                                                                                                                    
-            :                 :     +- *(2) FileScan parquet [author_flair_text#3,body#4,created_utc#10L,id#14,link_id#16] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/comments.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<author_flair_text:string,body:string,created_utc:bigint,id:string,link_id:string>                                                                                                                                                                                                                                                                  
-            :                 +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]))                                                                                                                                                                                                                           
-            :                    +- *(1) Filter isnotnull(id#69)                                                                                                                                                                                                                                                                        
-            :                       +- *(1) Sample 0.0, 0.2, false, -6303060203833664997                                                                                                                                                                                                                                                
-            :                          +- *(1) FileScan parquet [id#69,title#106] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/submissions.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<id:string,title:string>                                      
-            +- *(8) Sort [comment_id#392 ASC NULLS FIRST], false, 0                                                                                                                                                                                                                                                                        
-                +- Exchange hashpartitioning(comment_id#392, 200)                                                                                                                                                                                                                                                                              
-                    +- *(7) Project [id#14 AS comment_id#392, UDF(UDF(UDF(pythonUDF0#406))) AS probability#345]                                                                                                                                                                                                                                    
-                        +- BatchEvalPython [sanitize(body#4)], [body#4, id#14, pythonUDF0#406]                                                                                                                                                                                                                                                         
-                            +- *(6) Project [body#4, id#14]                                                                                                                                                                                                                                                                                                
-                                +- *(6) BroadcastHashJoin [ltrim(link_id#16, Some(t3_))], [id#69], Inner, BuildRight                                                                                                                                                                                                                                           
-                                    :- *(6) Filter (((isnotnull(body#4) && NOT Contains(body#4, /s)) && NOT StartsWith(body#4, &gt)) && isnotnull(id#14))                                                                                                                                                                                                       
-                                    :  +- *(6) Sample 0.0, 0.2, false, -5607937167649919925                                                                                                                                                                                                                                                                     
-                                    :     +- *(6) FileScan parquet [body#4,id#14,link_id#16] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/comments.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<body:string,id:string,link_id:string>                                        
-                                    +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]))                                                                                                                                                                                                                                                
-                                        +- *(5) Filter isnotnull(id#69)                                                                                                                                                                                                                                                                                                
-                                            +- *(5) Sample 0.0, 0.2, false, -6303060203833664997                                                                                                                                                                                                                                                                           
-                                                +- *(5) FileScan parquet [id#69] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/submissions.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<id:string>                                                    
----------------------------------------------------------------------------
 
 threshold_sql = """
 SELECT
@@ -77,3 +45,44 @@ SELECT
 FROM pos_result a
 INNER JOIN neg_result b ON a.comment_id = b.comment_id
 """
+full_sentiment_data = context.sql(threshold_sql).explain()
+
+
+== Physical Plan ==
+*(10) Project [comment_id#276, timestamp#278L, state#279, title#106, if ((cast(pythonUDF0#407 as double) > 0.2)) 1 else 0 AS pos#377, if ((cast(pythonUDF1#408 as double) > 0.25)) 1 else 0 AS neg#378]
++- BatchEvalPython [first_element(probability#309), first_element(probability#345)], [comment_id#276, probability#309, probability#345, state#279, timestamp#278L, title#106, pythonUDF0#407, pythonUDF1#408]
+    +- *(9) Project [comment_id#276, probability#309, probability#345, state#279, timestamp#278L, title#106]
+        +- *(9) SortMergeJoin [comment_id#276], [comment_id#392], Inner
+            :- *(4) Sort [comment_id#276 ASC NULLS FIRST], false, 0
+            :  +- Exchange hashpartitioning(comment_id#276, 200)
+            :     +- *(3) Project [id#14 AS comment_id#276, created_utc#10L AS timestamp#278L, author_flair_text#3 AS state#279, title#106, UDF(UDF(UDF(pythonUDF0#405))) AS probability#309]
+            :        +- BatchEvalPython [sanitize(body#4)], [author_flair_text#3, body#4, created_utc#10L, id#14, title#106, pythonUDF0#405]
+            :           +- *(2) Project [author_flair_text#3, body#4, created_utc#10L, id#14, title#106]
+            :              +- *(2) BroadcastHashJoin [ltrim(link_id#16, Some(t3_))], [id#69], Inner, BuildRight
+            :                 :- *(2) Filter (((isnotnull(body#4) && NOT Contains(body#4, /s)) && NOT StartsWith(body#4, &gt)) && isnotnull(id#14))
+            :                 :  +- *(2) Sample 0.0, 0.2, false, -5607937167649919925
+            :                 :     +- *(2) FileScan parquet [author_flair_text#3,body#4,created_utc#10L,id#14,link_id#16] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/comments.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<author_flair_text:string,body:string,created_utc:bigint,id:string,link_id:string>
+            :                 +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]))
+            :                    +- *(1) Filter isnotnull(id#69)
+            :                       +- *(1) Sample 0.0, 0.2, false, -6303060203833664997
+            :                          +- *(1) FileScan parquet [id#69,title#106] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/submissions.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<id:string,title:string>
+            +- *(8) Sort [comment_id#392 ASC NULLS FIRST], false, 0
+                +- Exchange hashpartitioning(comment_id#392, 200)
+                    +- *(7) Project [id#14 AS comment_id#392, UDF(UDF(UDF(pythonUDF0#406))) AS probability#345]
+                        +- BatchEvalPython [sanitize(body#4)], [body#4, id#14, pythonUDF0#406]
+                            +- *(6) Project [body#4, id#14]
+                                +- *(6) BroadcastHashJoin [ltrim(link_id#16, Some(t3_))], [id#69], Inner, BuildRight
+                                    :- *(6) Filter (((isnotnull(body#4) && NOT Contains(body#4, /s)) && NOT StartsWith(body#4, &gt)) && isnotnull(id#14))
+                                    :  +- *(6) Sample 0.0, 0.2, false, -5607937167649919925
+                                    :     +- *(6) FileScan parquet [body#4,id#14,link_id#16] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/comments.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<body:string,id:string,link_id:string>
+                                    +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]))
+                                        +- *(5) Filter isnotnull(id#69)
+                                            +- *(5) Sample 0.0, 0.2, false, -6303060203833664997
+                                                +- *(5) FileScan parquet [id#69] Batched: true, Format: Parquet, Location: InMemoryFileIndex[file:/media/sf_vm-shared/CS-143-Project-2b/submissions.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<id:string>
+---------------------------------------------------------------------------
+
+From this plan we can see that the join for the query used by Spark is called BroadcastHashJoin,
+which is used by spark whenever one side of the join is below a specified threshold [1].
+Broadcast join can be very efficient for joins between a large table (fact) with relatively small tables
+
+[1]: https://jaceklaskowski.gitbooks.io/mastering-spark-sql/spark-sql-joins-broadcast.html
