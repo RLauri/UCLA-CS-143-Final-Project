@@ -13,11 +13,63 @@ from py4j.protocol import Py4JJavaError
 import os
 import shutil
 
-from cleantext import sanitize 
+from cleantext import sanitize
 
 
 MIN_DF = 10
 TRAIN = False
+STATES = ['Alabama',
+          'Alaska',
+          'Arizona',
+          'Arkansas',
+          'California',
+          'Colorado',
+          'Connecticut',
+          'Delaware',
+          'District of Columbia',
+          'Florida',
+          'Georgia',
+          'Hawaii',
+          'Idaho',
+          'Illinois',
+          'Indiana',
+          'Iowa',
+          'Kansas',
+          'Kentucky',
+          'Louisiana',
+          'Maine',
+          'Maryland',
+          'Massachusetts',
+          'Michigan',
+          'Minnesota',
+          'Mississippi',
+          'Missouri',
+          'Montana',
+          'Nebraska',
+          'Nevada',
+          'New Hampshire',
+          'New Jersey',
+          'New Mexico',
+          'New York',
+          'North Carolina',
+          'North Dakota',
+          'Ohio',
+          'Oklahoma',
+          'Oregon',
+          'Pennsylvania',
+          'Rhode Island',
+          'South Carolina',
+          'South Dakota',
+          'Tennessee',
+          'Texas',
+          'Utah',
+          'Vermont',
+          'Virginia',
+          'Washington',
+          'West Virginia',
+          'Wisconsin',
+          'Wyoming',
+]
 
 
 def modified_sanitize(text):
@@ -35,7 +87,7 @@ def modified_sanitize(text):
 
 def generate_joined_data(labeled_data, comments, context):
     """
-    Creates a data frame containing all the joined comments from 
+    Creates a data frame containing all the joined comments from
     labeled_data and comments
     """
     comments.createOrReplaceTempView("comments")
@@ -73,8 +125,8 @@ SELECT
     comments.score AS comment_score,
     submissions.score AS submission_score
 FROM comments
-JOIN submissions ON ltrim('t3_', comments.link_id) = submissions.id 
-AND comments.body NOT LIKE '%/s%' 
+JOIN submissions ON ltrim('t3_', comments.link_id) = submissions.id
+AND comments.body NOT LIKE '%/s%'
 AND comments.body NOT LIKE '&gt%'"""
     return context.sql(full_comment_join_sql)
 
@@ -91,7 +143,7 @@ SELECT
     sanitize(body) AS body,
     timestamp,
     state,
-    title, 
+    title,
     comment_score,
     submission_score
 FROM full_comments_data"""
@@ -118,7 +170,7 @@ def main(context):
             submissions.write.parquet("submissions.parquet")
 
             labeled_data = context.read.csv("labeled_data.csv", header='true')
-            labeled_data.write.parquet("labeled_data.parquet") 
+            labeled_data.write.parquet("labeled_data.parquet")
 
         # Create temporary views for later
         comments.createGlobalTempView("comments")
@@ -142,7 +194,7 @@ def main(context):
             joined_data.createOrReplaceTempView("joined_data")
 
             ngram_sql = """
-        SELECT 
+        SELECT
             Input_id,
             labeldem,
             labelgop,
@@ -169,7 +221,7 @@ def main(context):
         else:
             result = model.transform(ngrams)
             result.write.parquet("result.parquet")
-        
+
 
         if os.path.isdir("sentiment_data.parquet"):
             sentiment_data = context.read.parquet("sentiment_data.parquet")
@@ -301,7 +353,7 @@ FROM full_sentiment_data"""
     if os.path.isdir("raw_percentages.csv"):
         shutil.rmtree("raw_percentages.csv")
     task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("raw_percentages.csv")
-    
+
     # part 2
     percent_by_day_sql = """
 SELECT
@@ -318,7 +370,39 @@ ORDER BY date"""
         shutil.rmtree("time_data.csv")
     task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("time_data.csv")
 
+    # Task 3
+    context.registerFunction("valid_state",
+                             lambda x: x in STATES,
+                             BooleanType())
+    task10_3_sql = """
+SELECT
+    author_flair_text AS state,
+    AVG(pos) AS Positive,
+    AVG(neg) AS Negative
+FROM full_sentiment_data
+WHERE (valid_state(author_flair_text))
+GROUP BY author_flair_text
+    """
+    task10_3 = context.sql(task10_3_sql)
+
     # part 4
+    task_10_4_sql_submission = """
+SELECT
+    submission_score,
+    AVG(pos) AS Positive,
+    AVG(neg) AS Negative,
+FROM full_sentiment_data
+    """
+
+    task_10_4_sql_comment = """
+SELECT
+    comment_score,
+    AVG(pos) AS Positive,
+    AVG(neg) AS Negative,
+FROM full_sentiment_data
+    """
+    percent_submission = context.sql(task_10_4_sql_submission)
+    percent_comment = context.sql(task_10_4_sql_comment)
 
 
 if __name__ == "__main__":
