@@ -1,5 +1,7 @@
 *.bz2
-*.parquet
+comments.parquet
+labeled_data.parquet
+submissions.parquet
 *.json
 labeled_data.csv
 __pycache__/
