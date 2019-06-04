@@ -96,7 +96,7 @@ def main(context):
 	
     # TASK 1
     if os.path.isdir("comments.parquet") and os.path.isdir("submissions.parquet") and os.path.isdir("labeled_data.parquet"):
-        print("WE HERE")
+        # print("WE HERE")
         comments = context.read.parquet("comments.parquet").sample(False, 0.2 , None)
         submissions = context.read.parquet("submissions.parquet").sample(False, 0.2 , None)
         labeled_data = context.read.parquet("labeled_data.parquet").sample(False, 0.2 , None)
@@ -257,11 +257,13 @@ def main(context):
     """
         pos_result.createOrReplaceTempView("pos_result")
         neg_result.createOrReplaceTempView("neg_result")
-        pos_result.printSchema()
+        # pos_result.printSchema()
+        # full_sentiment_data = context.sql(threshold_sql).explain()
         full_sentiment_data = context.sql(threshold_sql)
         full_sentiment_data.write.parquet("full_sentiment_data.parquet")
         # full_sentiment_data.show()
     # full_sentiment_data.show(20, False)
+    # exit(1)
 
     # TASK 10
 
@@ -275,6 +277,7 @@ FROM full_sentiment_data"""
     task10_1 = context.sql(percent_sql)
     # task10_1.show()
     task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_1.csv")
+    
     # part 2
     percent_by_day_sql = """
 SELECT
@@ -288,6 +291,8 @@ ORDER BY date"""
     task10_2 = context.sql(percent_by_day_sql)
     # task10_2.show()
     task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_2.csv")
+
+    # part 3
 
 
 if __name__ == "__main__":
