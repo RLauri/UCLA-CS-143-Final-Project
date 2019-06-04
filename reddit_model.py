@@ -230,7 +230,7 @@ def main(context):
 
     # task 6A
     result_full_data = model.transform(sanitized_full_comments)
-
+    result_full_data.show()
     # classification part of task 9
     pos_result = pos_model.transform(result_full_data)
     pos_result.show()
