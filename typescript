@@ -3495,4 +3495,70 @@ Execution halted
 [01;32manalysis.r[0m                 [01;34mfull_sentiment_data.parquet[0m  [01;32mparquet_maker.py[0m  [01;34mraw_percentages.csv[0m  [01;34msentiment_data.parquet[0m  [01;34msubmission_score.csv[0m  [01;34mtop_pos_submissions.csv[0m
 [01;32mbackup.pdf[0m                 [01;34mjoined_data.parquet[0m          [01;32mpart1.png[0m         [01;32mREADME.txt[0m           [01;34mspark-warehouse[0m         [01;32msubmissions.json.bz2[0m  [01;32mtypescript[0m
 [01;32mcleantext.py[0m               [01;32mlabeled_data.csv[0m             [01;32mplot5a.png[0m        [01;32mreddit_model.py[0m      [01;32mst99_d00.dbf[0m            [01;34msubmissions.parquet[0m
-[01;34mcomment_score.csv[0m          [01;34mlabeled_data.parquet[0m         [01;32mplot5b.png[0m        [01;34mresul
+[01;34mcomment_score.csv[0m          [01;34mlabeled_data.parquet[0m         [01;32mplot5b.png[0m        [01;34mresult.parquet[0m       [01;32mst99_d00.shp[0m            [01;32mteam.txt[0m
+[01;32mcomments-minimal.json.bz2[0m  [01;32mmycoolmap.png[0m                [01;34mproject2[0m          [01;32mRplots.pdf[0m           [01;32mst99_d00.shx[0m            [01;34mtime_data.csv[0m
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ lsRscript analysis.r ls[K[KlsRscript analysis.r 
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Joining, by = "region"
+Error in eval(m$data, eframe) : object 'story.data' not found
+Calls: plot -> plot.formula -> eval -> eval
+Execution halted
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ Rscript analysis.r 
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Joining, by = "region"
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ g9it [K[K[K[Kit status
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	[31mmodified:   Rplots.pdf[m
+	[31mmodified:   analysis.py[m
+	[31mmodified:   analysis.r[m
+	[31mmodified:   typescript[m
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	[31mbackup.pdf[m
+	[31mmycoolmap.png[m
+	[31mplot5a.png[m
+	[31mplot5b.png[m
+
+no changes added to commit (use "git add" and/or "git commit -a")
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git commit "fixed Rosaris^H[K[Ko's fuckup, ^H[K[K[K[K[K[K[K[K[Kcode, finished plt[K\[Kotting data with R scrips [K[Kt (Rplots.pdf)"[1@-[1@a[1@m[1@ 
+[master 75cc842] fixed Rosario's code, finished plotting data with R script (Rplots.pdf)
+ 4 files changed, 273 insertions(+), 7 deletions(-)
+ rewrite Rplots.pdf (61%)
+]0;cs143@cs143-19s-p2: /media/sf_vm-shared/CS-143-Project-2b[01;32mcs143@cs143-19s-p2[00m:[01;34m/media/sf_vm-shared/CS-143-Project-2b[00m$ git push
+Username for 'https://github.com': RLauri
+Password for 'https://RLauri@github.com': 
+Enumerating objects: 11, done.
+Counting objects:   9% (1/11)   Counting objects:  18% (2/11)   Counting objects:  27% (3/11)   Counting objects:  36% (4/11)   Counting objects:  45% (5/11)   Counting objects:  54% (6/11)   Counting objects:  63% (7/11)   Counting objects:  72% (8/11)   Counting objects:  81% (9/11)   Counting objects:  90% (10/11)   Counting objects: 100% (11/11)   Counting objects: 100% (11/11), done.
+Delta compression using up to 12 threads
+Compressing objects:  16% (1/6)   Compressing objects:  33% (2/6)   Compressing objects:  50% (3/6)   Compressing objects:  66% (4/6)   Compressing objects:  83% (5/6)   Compressing objects: 100% (6/6)   Compressing objects: 100% (6/6), done.
+Writing objects:  16% (1/6)   Writing objects:  33% (2/6)   Writing objects:  50% (3/6)   Writing objects:  66% (4/6)   Writing objects:  83% (5/6)   Writing objects: 100% (6/6)   Writing objects: 100% (6/6), 295.00 KiB | 7.38 MiB/s, done.
+Total 6 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas:   0% (0/4)   [Kremote: Resolving deltas:  25% (1/4)   [Kremote: Resolving deltas:  50% (2/4)   [Kremote: Resolving deltas:  75% (3/4)   [Kremote

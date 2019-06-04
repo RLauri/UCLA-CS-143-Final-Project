@@ -350,9 +350,9 @@ FROM full_sentiment_data"""
     full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_1 = context.sql(percent_sql)
     # task10_1.show()
-    # if os.path.isdir("raw_percentages.csv"):
-    #     shutil.rmtree("raw_percentages.csv")
-    # task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("raw_percentages.csv")
+    if os.path.isdir("raw_percentages.csv"):
+        shutil.rmtree("raw_percentages.csv")
+    task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("raw_percentages.csv")
 
     # part 2
     percent_by_day_sql = """
@@ -366,9 +366,9 @@ ORDER BY date"""
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_2 = context.sql(percent_by_day_sql)
     # task10_2.show()
-    # if os.path.isdir("time_data.csv"):
-    #     shutil.rmtree("time_data.csv")
-    # task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("time_data.csv")
+    if os.path.isdir("time_data.csv"):
+        shutil.rmtree("time_data.csv")
+    task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("time_data.csv")
 
     # Task 3
     context.registerFunction("valid_state",
@@ -413,12 +413,12 @@ GROUP BY comment_score
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     percent_comment = context.sql(task_10_4_sql_comment)
 
-    # if os.path.isdir("submission_score.csv"):
-    #     shutil.rmtree("submission_score.csv")
-    # percent_submission.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("submission_score.csv")
-    # if os.path.isdir("comment_score.csv"):
-    #     shutil.rmtree("comment_score.csv")
-    # percent_comment.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("comment_score.csv")
+    if os.path.isdir("submission_score.csv"):
+        shutil.rmtree("submission_score.csv")
+    percent_submission.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("submission_score.csv")
+    if os.path.isdir("comment_score.csv"):
+        shutil.rmtree("comment_score.csv")
+    percent_comment.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("comment_score.csv")
 
     # FOR 4 in, to get the top ten pos and neg submissions
     top_pos_submissions_sql =  """
@@ -450,12 +450,12 @@ LIMIT 10
 
     top_neg_submissions = context.sql(top_neg_submissions_sql)
     # top_neg_submissions.show()
-    # if os.path.isdir("top_pos_submissions.csv"):
-    #     shutil.rmtree("top_pos_submissions.csv")
-    # top_pos_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_pos_submissions.csv")
-    # if os.path.isdir("top_neg_submissions.csv"):
-    #     shutil.rmtree("top_neg_submissions.csv")
-    # top_neg_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_neg_submissions.csv")
+    if os.path.isdir("top_pos_submissions.csv"):
+        shutil.rmtree("top_pos_submissions.csv")
+    top_pos_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_pos_submissions.csv")
+    if os.path.isdir("top_neg_submissions.csv"):
+        shutil.rmtree("top_neg_submissions.csv")
+    top_neg_submissions.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("top_neg_submissions.csv")
 
 
 if __name__ == "__main__":
