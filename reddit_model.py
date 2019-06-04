@@ -65,10 +65,13 @@ def generate_full_comments_data(submissions, comments, context):
     full_comment_join_sql = """
 SELECT
     comments.id AS comment_id,
+    submissions.id AS submission_id,
     comments.body AS body,
     comments.created_utc AS timestamp,
     comments.author_flair_text AS state,
-    submissions.title AS title
+    submissions.title AS title,
+    comments.score AS comment_score,
+    submissions.score AS submission_score
 FROM comments
 JOIN submissions ON ltrim('t3_', comments.link_id) = submissions.id 
 AND comments.body NOT LIKE '%/s%' 
@@ -84,10 +87,13 @@ def generate_sanitized_full_comments(context, full_comments_data):
     sanitized_full_comments_sql = """
 SELECT
     comment_id,
+    submission_id,
     sanitize(body) AS body,
     timestamp,
     state,
-    title
+    title, 
+    comment_score,
+    submission_score
 FROM full_comments_data"""
     return context.sql(sanitized_full_comments_sql)
 
@@ -260,11 +266,14 @@ def main(context):
         threshold_sql = """
     SELECT
         a.comment_id AS comment_id,
+        a.submission_id AS submission_id,
         a.timestamp AS timestamp,
         a.state AS state,
         a.title AS title,
         if (first_element(a.probability) > 0.2, 1, 0) AS pos,
-        if (first_element(b.probability) > 0.25, 1, 0) AS neg
+        if (first_element(b.probability) > 0.25, 1, 0) AS neg,
+        a.comment_score AS comment_score,
+        a.submission_score AS submission_score
     FROM pos_result a
     INNER JOIN neg_result b ON a.comment_id = b.comment_id
     """
@@ -275,7 +284,7 @@ def main(context):
         full_sentiment_data = context.sql(threshold_sql)
         full_sentiment_data.write.parquet("full_sentiment_data.parquet")
         # full_sentiment_data.show()
-        # full_sentiment_data.show(20, False)
+        full_sentiment_data.show(20, False)
         # exit(1)
 
     # TASK 10
