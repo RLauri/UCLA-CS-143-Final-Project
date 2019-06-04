@@ -9,6 +9,8 @@ from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.tuning import CrossValidator, CrossValidatorModel, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.sql.functions import ltrim
+from py4j.protocol import Py4JJavaError
+
 
 from cleantext import sanitize 
 
@@ -35,7 +37,6 @@ def generate_joined_data(labeled_data, comments, context):
     Creates a data frame containing all the joined comments from 
     labeled_data and comments
     """
-    # Create temporary views in order to create the joined data
     comments.createOrReplaceTempView("comments")
     labeled_data.createOrReplaceTempView("labeled_data")
 
@@ -50,16 +51,14 @@ FROM labeled_data
 JOIN comments ON Input_id = id"""
     return context.sql(join_comment_sql)
 
+
 def generate_full_comments_data(submissions, comments, context):
     """
     creates a data frame to fulfill the requirements of both tasks 8 and 9
     """
 
-    # needed submissions view
+    # # needed submissions view and remakes comments view in case it hadn't been done previously
     submissions.createOrReplaceTempView("submissions")
-
-    # trims out leading 't3_' from comment links for task 8 and remakes view
-    # comments = comments.withColumn('link_id', ltrim('t3_', comments.link_id))
     comments.createOrReplaceTempView("comments")
 
     full_comment_join_sql = """
@@ -76,6 +75,20 @@ AND comments.body NOT LIKE '&gt%'"""
     return context.sql(full_comment_join_sql)
 
 
+def generate_sanitized_full_comments(context, full_comments_data):
+    """
+    takes full data and runs sanitize on body column
+    """
+    full_comments_data.createOrReplaceTempView("full_comments_data")
+    sanitized_full_comments_sql = """
+SELECT
+    comment_id,
+    sanitize(body) AS body,
+    timestamp,
+    state,
+    title
+FROM full_comments_data"""
+    return context.sql(sanitized_full_comments_sql)
 
 
 def main(context):
@@ -86,7 +99,7 @@ def main(context):
         comments = context.read.parquet("comments.parquet")
         submissions = context.read.parquet("submissions.parquet")
         labeled_data = context.read.parquet("labeled_data.parquet")
-    except FileNotFoundError:
+    except (Py4JJavaError, FileNotFoundError) as e:
         comments = context.read.json("comments-minimal.json.bz2")
         comments.write.parquet("comments.parquet")
 
@@ -96,9 +109,14 @@ def main(context):
         labeled_data.write.parquet("labeled_data.parquet") 
         labeled_data = context.read.csv("labeled_data.csv", header='true')
 
+    # Create temporary views for later
+    comments.createGlobalTempView("comments")
+    labeled_data.createGlobalTempView("labeled_data")
+    submissions.createGlobalTempView("submissions")
+
     try:
         sentiment_data = context.read.parquet("sentiment_data.parquet")
-    except:
+    except (Py4JJavaError, FileNotFoundError) as e:
 
         # TASK 4
         context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
@@ -149,7 +167,7 @@ def main(context):
     try:
         pos_model = CrossValidatorModel.load("project2/pos.model")
         neg_model = CrossValidatorModel.load("project2/neg.model")
-    except FileNotFoundError:
+    except (Py4JJavaError, FileNotFoundError) as e:
         poslr = LogisticRegression(labelCol="pos_label", featuresCol="features", maxIter=10)
         neglr = LogisticRegression(labelCol="neg_label", featuresCol="features", maxIter=10)
         # This is a binary classifier so we need an evaluator that knows how to deal with binary classifiers.
@@ -189,7 +207,18 @@ def main(context):
 
     # TASK 8
     full_comments_data = generate_full_comments_data(submissions, comments, context)
-    full_comments_data.filter("state is not null or state is not 'Foreign'").show()
+    # full_comments_data.filter("state is not null").show()
+
+    # TASK 9
+
+    # task 4 redone
+    # reregisters function in case of exception not happening for previous task 4
+    context.registerFunction("sanitize", modified_sanitize, ArrayType(StringType()))
+
+    # task 5 redone
+    sanitized_full_comments = generate_sanitized_full_comments(context, full_comments_data)
+    sanitized_full_comments.show()
+
 
 
 if __name__ == "__main__":
