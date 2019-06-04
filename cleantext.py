@@ -172,11 +172,7 @@ def sanitize(text):
     for window in sliding_window(grams, 3):
         trigrams.append('_'.join(window))
     trigrams = ' '.join(trigrams)
-
-    return unigrams + bigrams + trigrams
-
-sanitize_udf = udf(sanitize, ArrayType(StringType()))
-
+    return [parsed_text, unigrams, bigrams, trigrams]
 
 
 if __name__ == "__main__":
