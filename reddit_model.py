@@ -235,9 +235,9 @@ def main(context):
 
     # classification part of task 9
     pos_result = pos_model.transform(result_full_data)
-    pos_result.show()
+    # pos_result.show()
     neg_result = neg_model.transform(result_full_data)
-    neg_result.show()
+    # neg_result.show()
 
     # probability threshold application from task 9
     if os.path.isdir("full_sentiment_data.parquet"):
@@ -261,7 +261,7 @@ def main(context):
         full_sentiment_data = context.sql(threshold_sql)
         full_sentiment_data.write.parquet("full_sentiment_data.parquet")
         # full_sentiment_data.show()
-    full_sentiment_data.show(20, False)
+    # full_sentiment_data.show(20, False)
 
     # TASK 10
 
@@ -273,8 +273,8 @@ SELECT
 FROM full_sentiment_data"""
     full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_1 = context.sql(percent_sql)
-    task10_1.show()
-
+    # task10_1.show()
+    task10_1.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_1.csv")
     # part 2
     percent_by_day_sql = """
 SELECT
@@ -282,10 +282,13 @@ SELECT
     AVG(pos) * 100.0 AS pos_percentage,
     AVG(neg) * 100.0 AS neg_percentage
 FROM full_sentiment_data
-GROUP BY date"""
+GROUP BY date
+ORDER BY date"""
     # full_sentiment_data.createOrReplaceTempView("full_sentiment_data")
     task10_2 = context.sql(percent_by_day_sql)
-    task10_2.show()
+    # task10_2.show()
+    task10_2.repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save("task10_2.csv")
+
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("CS143 Project 2B")
