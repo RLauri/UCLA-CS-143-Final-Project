@@ -1,7 +1,7 @@
 from __future__ import print_function
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext
-# TODO: Check to see if we need this
+# TODO: Check to see if we need this :)
 # from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType, ArrayType, BooleanType, FloatType
 from pyspark.ml.feature import CountVectorizer
