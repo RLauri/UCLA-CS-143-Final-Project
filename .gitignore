@@ -1,7 +1,5 @@
 *.bz2
-comments.parquet
-labeled_data.parquet
-submissions.parquet
 *.json
-labeled_data.csv
+*.parquet
 __pycache__/
+team.txt
